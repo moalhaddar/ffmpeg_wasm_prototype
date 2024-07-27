@@ -43,9 +43,10 @@ self.onmessage = (msg) => {
 
         const filePath = `${mountPoint}/` + file.name;
         const begin = performance.now()
-        const exitCode = ffmpegModule.init(filePath)
+        const result = ffmpegModule.init(filePath)
         const end = performance.now();
-        console.log(`init() exited with code ${exitCode}. Time: ${end-begin}ms`);
+        console.log(`init() exited with code ${result.exit}. Time: ${end-begin}ms`);
+        console.log(result);
         ffmpegModule.FS.unmount(mountPoint)
     }
 };

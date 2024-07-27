@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <emscripten/bind.h>
+#include <emscripten/val.h>
 #include <iostream>
+#include <sstream>
+#include <vector>
 extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
@@ -8,48 +11,64 @@ extern "C" {
 #include "libavutil/avutil.h"
 #include "libswscale/swscale.h"
 }
-
 #include <emscripten/wasm_worker.h>
 
-int init(const std::string inputPath) {
+emscripten::val init(const std::string inputPath) {
+    emscripten::val result = emscripten::val::object();
     AVFormatContext* format_ctx = nullptr;
-    
     if (avformat_open_input(&format_ctx, inputPath.c_str(), nullptr, nullptr) < 0) {
-        std::cerr << "Could not open input file: " << inputPath << std::endl;
-        return 2;
+        result.set("exit", -1);
+        return result;
     }
 
-    // Retrieve stream information
     if (avformat_find_stream_info(format_ctx, nullptr) < 0) {
-        std::cerr << "Could not find stream information" << std::endl;
         avformat_close_input(&format_ctx);
-        return 3;
+        result.set("exit", -1);
+        return result;
     }
 
-    // Print format and stream information
-    std::cout << "Format: " << format_ctx->iformat->name << std::endl;
-    std::cout << "Duration: " << format_ctx->duration / AV_TIME_BASE << " seconds" << std::endl;
-    std::cout << "Number of streams: " << format_ctx->nb_streams << std::endl;
+    
+    result.set("format", format_ctx->iformat->name);
+    result.set("duration", ((float)format_ctx->duration / (float)AV_TIME_BASE));
+    result.set("nb_streams", format_ctx->nb_streams);
 
+    emscripten::val streams = emscripten::val::array();
     for (unsigned int i = 0; i < format_ctx->nb_streams; i++) {
         AVStream *stream = format_ctx->streams[i];
         AVCodecParameters *codecpar = stream->codecpar;
 
-        std::cout << "\nStream #" << i << ":" << std::endl;
-        std::cout << "  Type: " << av_get_media_type_string(codecpar->codec_type) << std::endl;
-        std::cout << "  Codec: " << avcodec_get_name(codecpar->codec_id) << std::endl;
+        emscripten::val stream_info = emscripten::val::object();
+        stream_info.set("index", i);
+        stream_info.set("type", av_get_media_type_string(codecpar->codec_type));
+        stream_info.set("codec", avcodec_get_name(codecpar->codec_id));
+
+        emscripten::val metadata = emscripten::val::object();
+        AVDictionaryEntry *tag = nullptr;
+        while ((tag = av_dict_get(stream->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+            
+            printf("%s => %s\n", tag->key, tag->value);
+            metadata.set(std::string(tag->key), std::string(tag->value));
+        }
+
+
+        stream_info.set("metadata", metadata);
 
         if (codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            std::cout << "  Resolution: " << codecpar->width << "x" << codecpar->height << std::endl;
-            std::cout << "  FPS: " << av_q2d(stream->avg_frame_rate) << std::endl;
+            stream_info.set("width", codecpar->width);
+            stream_info.set("height", codecpar->height);
+            stream_info.set("fps", av_q2d(stream->avg_frame_rate));
         } else if (codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            std::cout << "  Sample rate: " << codecpar->sample_rate << " Hz" << std::endl;
-            std::cout << "  Channels: " << codecpar->channels << std::endl;
+            stream_info.set("sample_rate", codecpar->sample_rate);
+            stream_info.set("channels", codecpar->channels);
         }
+
+        streams.call<void>("push", stream_info);
     }
 
+    result.set("streams", streams);
+    result.set("exit", 0);
     avformat_close_input(&format_ctx);
-    return 0;
+    return result;
 }
 
 EMSCRIPTEN_BINDINGS(alhaddar) {
