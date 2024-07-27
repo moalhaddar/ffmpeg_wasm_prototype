@@ -1,0 +1,40 @@
+<html>
+
+<head>
+    <script>
+        let worker = new Worker("./worker.js", {
+			name: "binding.js",
+		});;
+
+        worker.addEventListener("message", (msg) => {
+			// if (msg.data.type === "stdout") {
+			// 	stdout += msg.data.payload;
+			// }
+			// if (msg.data.type === "loaded") {
+			// 	loaded = msg.data.payload;
+			// }
+		});
+
+        function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                console.log("No file selected");
+                return;
+            }
+
+            worker.postMessage({
+                type: "process",
+                payload: { name: file.name, data: file }
+            })
+        }
+    </script>
+    <script src="./binding.js"></script>
+</head>
+
+<body>
+    <input type="file" id="fileInput" />
+<button onclick="processFile()">Process File</button>
+</body>
+
+</html>

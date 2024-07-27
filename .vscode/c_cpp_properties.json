@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "./FFmpeg/**",
+                "~/tools/emsdk/upstream/emscripten/system/include/**",
+                "/home/moalhaddar/programming/ffmpeg_wasm/FFmpeg/libavformat/**"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ],
+    "version": 4
+}
