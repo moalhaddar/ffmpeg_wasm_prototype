@@ -1,20 +1,29 @@
 mkdir -p ffmpeg-wasm
 
-em++ \
-    -I./FFmpeg/ \
+emcc \
+    -I./FFmpeg/ -I./FFmpeg/fftools \
     -L./FFmpeg/libavcodec \
     -L./FFmpeg/libavdevice \
     -L./FFmpeg/libavfilter \
     -L./FFmpeg/libavformat \
     -L./FFmpeg/libavutil \
     -L./FFmpeg/libswresample \
+    -L./FFmpeg/libpostproc \
     -L./FFmpeg/libswscale \
+    -L./FFmpeg/libswresample \
     -lavcodec  -lavdevice -lavfilter -lavformat -lavutil -lswresample -lswscale  \
     -lembind -lworkerfs.js \
     -sINITIAL_MEMORY=1024MB \
     -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency \
     -sEXPORTED_RUNTIME_METHODS=FS \
-    -sMODULARIZE -sEXPORT_NAME="createFFmpeg"\
-    -O3 -sUSE_PTHREADS=1 \
+    -sMODULARIZE -sEXPORT_NAME="createFFmpeg" \
+    -sINVOKE_RUN=0 \
+    -O3 -sUSE_PTHREADS=1 -s USE_SDL=2  \
+    -Qunused-arguments \
     -o ./ffmpeg-wasm/ffmpeg.js \
-    ./src/main.cpp
+    ./src/main.cpp \
+    ./FFmpeg/fftools/ffmpeg_opt.c \
+    ./FFmpeg/fftools/ffmpeg_filter.c \
+    ./FFmpeg/fftools/ffmpeg_hw.c \
+    ./FFmpeg/fftools/cmdutils.c \
+    ./FFmpeg/fftools/ffmpeg.c

@@ -72,6 +72,10 @@
         "thread": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "config.h": "c",
+        "bind.h": "c",
+        "os_support.h": "c",
+        "threadmessage.h": "c"
     }
 }
