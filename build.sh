@@ -12,8 +12,9 @@ em++ \
     -lavcodec  -lavdevice -lavfilter -lavformat -lavutil -lswresample -lswscale  \
     -lembind -lworkerfs.js \
     -sINITIAL_MEMORY=1024MB \
-    -sPTHREAD_POOL_SIZE=32 \
+    -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency \
     -sEXPORTED_RUNTIME_METHODS=FS \
     -sMODULARIZE -sEXPORT_NAME="createFFmpeg"\
+    -O3 -sUSE_PTHREADS=1 \
     -o ./ffmpeg-wasm/ffmpeg.js \
     ./src/main.cpp

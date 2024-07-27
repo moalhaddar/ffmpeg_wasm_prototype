@@ -2,17 +2,22 @@
 
 emcc -v
 
+CFLAGS="-s USE_PTHREADS -O3"
+LDFLAGS="$CFLAGS -s INITIAL_MEMORY=32M"
 FLAGS=(
     --target-os=none
     --arch=x86_32
     --enable-cross-compile
-    --disable-asm                 # disable asm
-    --disable-stripping           # disable stripping as it won't work
-    --disable-programs            # disable ffmpeg, ffprobe and ffplay build
-    --disable-doc                 # disable doc build
-    --disable-debug               # disable debug mode
-    --disable-runtime-cpudetect   # disable cpu detection
-    --disable-autodetect          # disable env auto detect
+    --disable-asm
+    --disable-stripping
+    --disable-programs
+    --disable-doc
+    --disable-debug
+    --disable-runtime-cpudetect
+    --disable-autodetect
+
+    --extra-cflags="$CFLAGS"
+    --extra-cxxflags="$CFLAGS"
 
     --nm=emnm
     --ar=emar
