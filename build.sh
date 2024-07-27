@@ -15,11 +15,12 @@ emcc \
     -lembind -lworkerfs.js \
     -sINITIAL_MEMORY=1024MB \
     -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency \
-    -sEXPORTED_RUNTIME_METHODS=FS \
+    -sEXPORTED_RUNTIME_METHODS="[FS, cwrap, ccall, setValue, stringToNewUTF8]" \
+    -sEXPORTED_FUNCTIONS=_main,_malloc \
     -sMODULARIZE -sEXPORT_NAME="createFFmpeg" \
     -sINVOKE_RUN=0 \
-    -O3 -sUSE_PTHREADS=1 -s USE_SDL=2  \
-    -Qunused-arguments \
+    -s USE_SDL=2  -sASYNCIFY \
+    -O3 -sUSE_PTHREADS=1 -Qunused-arguments \
     -o ./ffmpeg-wasm/ffmpeg.js \
     ./src/main.cpp \
     ./FFmpeg/fftools/ffmpeg_opt.c \
@@ -27,3 +28,5 @@ emcc \
     ./FFmpeg/fftools/ffmpeg_hw.c \
     ./FFmpeg/fftools/cmdutils.c \
     ./FFmpeg/fftools/ffmpeg.c
+
+cp -r ffmpeg-wasm ~/programming/alhaddar-dev/src/lib
