@@ -19,7 +19,7 @@ emcc \
     -sEXPORTED_FUNCTIONS=_main,_malloc \
     -sMODULARIZE -sEXPORT_NAME="createFFmpeg" \
     -sINVOKE_RUN=0 \
-    -s USE_SDL=2  -sASYNCIFY \
+    -s USE_SDL=2 \
     -O3 -sUSE_PTHREADS=1 -Qunused-arguments \
     -o ./ffmpeg-wasm/ffmpeg.js \
     ./src/main.cpp \
