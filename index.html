@@ -2,9 +2,9 @@
 
 <head>
     <script>
-        let worker = new Worker("./worker.js", {
-			name: "binding.js",
-		});;
+        let worker = new Worker("./ffmpeg-wasm/worker.js", {
+			name: "worker.js",
+		});
 
         worker.addEventListener("message", (msg) => {
 			// if (msg.data.type === "stdout") {

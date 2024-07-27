@@ -1,4 +1,4 @@
-mkdir -p wasm
+mkdir -p ffmpeg-wasm
 
 em++ \
     -I./FFmpeg/ \
@@ -15,5 +15,5 @@ em++ \
     -sPTHREAD_POOL_SIZE=32 \
     -sEXPORTED_RUNTIME_METHODS=FS \
     -sMODULARIZE -sEXPORT_NAME="createFFmpeg"\
-    -o ./wasm/binding.js \
-    ./src/binding.cpp
+    -o ./ffmpeg-wasm/ffmpeg.js \
+    ./src/main.cpp
